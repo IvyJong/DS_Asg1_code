@@ -1,14 +1,13 @@
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.math.BigInteger; //convert byte arrays into a positive integer
+import java.nio.charset.StandardCharsets; //provides UTF-8 character encoding when converting passwords into bytes
+import java.security.MessageDigest; // for generating MD5 hashes.
+import java.security.NoSuchAlgorithmException;  //Handles errors when the requested hashing algorithm is unavailable
+import java.util.ArrayList; // Provides array list to store and manage worker threads
+import java.util.List; //List interface for managing collections of worker thread
+import java.util.concurrent.atomic.AtomicReference; //Provides thread-safe access to a shared search result between multiple threads
 
 public class MD5Search {
-
     // Declare Total possible ASCII characters: decimal 32 to 126
     private static final int CHAR_START = 32;
     private static final int CHAR_END = 126;
