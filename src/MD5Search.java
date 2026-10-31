@@ -342,10 +342,10 @@ public class MD5Search {
     }
 
 
-    // =========================================================
-    // SUPPORTING CLASS: Search range assigned to each thread
-    // =========================================================
 
+    /*
+     * SUPPORTING CLASS: Search range assigned to each thread
+     */
     private static class SearchRange {
 
         private final long startInclusive;
@@ -357,10 +357,9 @@ public class MD5Search {
         }
     }
 
-
-    // =========================================================
-    // SUPPORTING CLASS: Store the recovered password and thread ID
-    // =========================================================
+    /*
+     * SUPPORTING CLASS: Store the recovered password and thread ID
+     */
 
     private static class SearchResult {
 
@@ -373,11 +372,9 @@ public class MD5Search {
         }
     }
 
-
-    // =========================================================
-    // SUPPORTING CLASS: Store validated CLI inputs
-    // =========================================================
-
+    /*
+     * SUPPORTING CLASS: Store validated CLI inputs
+     */
     private static class Config {
 
         private final String targetHash;
