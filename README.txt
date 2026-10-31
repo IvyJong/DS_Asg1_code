@@ -37,5 +37,5 @@
 
 5. Wait for all 36 experiments to finish.
 6. Open the generated CSV files inside the `benchmark` folder:
-   - `performance_runs.csv`
-   - `performance_summary.csv`
+   - performance_runs.csv
+   - performance_summary.csv
