@@ -1,5 +1,5 @@
 # How to Run MD5Search
-## A. Run the Java Program
+## A. Run the Java Program (this is for test 2- and  3-char hash)
 1. Open the project folder in VS Code.
 2. Open the terminal
 3. Compile the Java program: 
@@ -17,8 +17,8 @@
    java -cp src MD5Search a46da3640231e41e1782925a91e46103 4 2
    
 
-## B. Run the Performance Benchmark
-
+## B. Run the Performance Benchmark (for 4- and 5-char if the ##A is works)
+#directly run this run benchmark file without using #A run java command 
 1. Open the VS Code terminal.
 2. Navigate to the benchmark folder: by type this command in terminal
 ===================
