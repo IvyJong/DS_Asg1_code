@@ -35,6 +35,7 @@ public class MD5Search {
             config.passwordLength
         );
 
+        //print output for hash information
         System.out.println("Target MD5: " + config.targetHash);
         System.out.println("Number of threads: " + config.threadCount);
         System.out.println("Password length: " + config.passwordLength);
@@ -75,18 +76,16 @@ public class MD5Search {
         double executionTime =
             (endTime - startTime) / 1_000_000_000.0;
 
-        // step 8: Display the search result
+        // step 8: Display the search result which is the final output of the program
         // Report the search results.
         SearchResult result = sharedResult.get();
-
         System.out.println("\n========== SEARCH RESULT ==========");
-
-        if (result != null) {
-            System.out.println("Password found: " + result.password);
-            System.out.println("Found by thread ID: " + result.threadId);
-        } else {
-            System.out.println("Password not found.");
-        }
+            if (result != null) {
+                System.out.println("Password found: " + result.password);
+                System.out.println("Found by thread ID: " + result.threadId);
+            } else {
+                System.out.println("Password not found.");
+            }
         
         //java.util.Locale.ROOT prevents your computer's 
         // regional settings from changing how decimal numbers are displayed
@@ -98,8 +97,9 @@ public class MD5Search {
         System.out.println("===================================");
     }
 
-
-    // Validate command-line arguments for make sure user input is correct
+    /* FOR Input error handling and validation
+     * Validate command-line arguments for make sure user input is correct
+     */
     private static Config validateInput(String[] args) {
 
         // Check that exactly three arguments are provided
@@ -149,11 +149,10 @@ public class MD5Search {
             passwordLength);
     }
 
-    // ==========================
-    // Generate MD5 hash of a password candidate. function
-    // ===========================
+    // ==================================================
+    // Generate MD5 hash of a password candidate function
+    // ==================================================
     public static String getMd5(String input) {
-
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
 
