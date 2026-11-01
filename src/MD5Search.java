@@ -1,4 +1,3 @@
-import java.math.BigInteger; //convert byte arrays into a positive integer
 import java.nio.charset.StandardCharsets; //provides UTF-8 character encoding when converting passwords into bytes
 import java.security.MessageDigest; // for generating MD5 hashes.
 import java.security.NoSuchAlgorithmException;  //Handles errors when the requested hashing algorithm is unavailable
@@ -149,27 +148,24 @@ public class MD5Search {
     }
 
     // Generate MD5 hash of a password candidate function
+    
     public static String getMd5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-
-            byte[] messageDigest =
-                md.digest(input.getBytes(StandardCharsets.UTF_8));
-
-            BigInteger no = new BigInteger(1, messageDigest);
-
-            String hashtext = no.toString(16);
-
-            // Ensure the hash always contains 32 characters
-            while (hashtext.length() < 32) {
-                hashtext = "0" + hashtext;
-            }
-
-            return hashtext;
+            return getMd5(md, input);
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("MD5 algorithm not available.", e);
         }
+    }
+
+    // Reuse an existing MessageDigest to calculate the MD5 hash.
+    private static String getMd5(MessageDigest md, String input) {
+
+        byte[] messageDigest =
+            md.digest(input.getBytes(StandardCharsets.UTF_8));
+
+        return java.util.HexFormat.of().formatHex(messageDigest);
     }
 
     // Calculate total search-space combinations function
@@ -288,38 +284,47 @@ public class MD5Search {
 
         @Override
         public void run() {
+            // Create one MD5 digest instance for this worker.
+            final MessageDigest md;
 
+            try {
+                md = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("MD5 algorithm not available.", e);
+            }
+
+            // Search through the worker's assigned range.
             for (long index = range.startInclusive;
                 index < range.endExclusive;
                 index++) {
 
-                // check whether another thread has found the password
+                // Check whether another worker has found the password.
                 if (sharedResult.get() != null) {
                     return;
                 }
 
-                // generate a password candidate
+                // Generate a password candidate.
                 String candidate = passwordFromIndex(
-                index,
-                passwordLength
+                    index,
+                    passwordLength
                 );
 
-                // generate MD5 hash of the candidate
-                String candidateHash = getMd5(candidate);
+                // Calculate MD5 using the reusable digest instance.
+                String candidateHash = getMd5(md, candidate);
 
-                // compare with the target MD5 hash
+                // Compare with the target MD5 hash.
                 if (candidateHash.equals(targetHash)) {
 
-                    // store the recovered password and thread ID
+                    // Store the recovered password and thread ID.
                     SearchResult foundResult = new SearchResult(
                         candidate,
                         Thread.currentThread().threadId()
                     );
 
-                    // publish the result to other threads
+                    // Publish the result to other workers.
                     sharedResult.compareAndSet(null, foundResult);
 
-                    // stop this worker
+                    // Stop this worker.
                     return;
                 }
             }
@@ -372,9 +377,9 @@ public class MD5Search {
 
         // initialize the validated input values
         public Config(
-                String targetHash,
-                int threadCount,
-                int passwordLength) {
+            String targetHash,
+            int threadCount,
+            int passwordLength) {
 
             this.targetHash = targetHash;
             this.threadCount = threadCount;
