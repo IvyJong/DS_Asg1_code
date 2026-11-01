@@ -1,4 +1,3 @@
-
 import java.math.BigInteger; //convert byte arrays into a positive integer
 import java.nio.charset.StandardCharsets; //provides UTF-8 character encoding when converting passwords into bytes
 import java.security.MessageDigest; // for generating MD5 hashes.
@@ -149,9 +148,7 @@ public class MD5Search {
             passwordLength);
     }
 
-    // ==================================================
     // Generate MD5 hash of a password candidate function
-    // ==================================================
     public static String getMd5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -175,9 +172,7 @@ public class MD5Search {
         }
     }
 
-    // =========================================================
     // Calculate total search-space combinations function
-    // =========================================================
     private static long calculateTotalCombinations(int passwordLength) {
 
         long total = 1;
@@ -189,9 +184,7 @@ public class MD5Search {
         return total;
     }
 
-    // =========================================================
     // Dynamically create worker threads function
-    // =========================================================
     private static List<Thread> createThreads(
             Config config,
             long totalCombinations,
@@ -225,15 +218,6 @@ public class MD5Search {
         return workers;
     }
 
-
-    // =========================================================
-    // 2ND PERSON Task: IMPLEMENT THIS PART
-    // Divide the complete search space among the requested threads.
-    // Each thread must receive a non-overlapping range.
-    // Use start-inclusive and end-exclusive indexes.
-    // The ranges must cover every combination.
-    // =========================================================
-
     // divide the search space into non-overlapping ranges for each thread
     // each range uses a start-inclusive and end-exclusive index
     private static List<SearchRange> partitionSearchSpace(
@@ -255,11 +239,6 @@ public class MD5Search {
 
         return ranges;
     }
-
-
-    // =========================================================
-    // 2ND PERSON Task: IMPLEMENT THIS PART
-    // =========================================================
 
     // convert a numeric index into a password using base-95 conversion
     private static String passwordFromIndex(
@@ -284,12 +263,6 @@ public class MD5Search {
 
         return new String(password);
     }
-
-
-    // =========================================================
-    // 2ND PERSON Task: IMPLEMENT THIS PART
-    // Worker thread performs the actual brute-force search.
-    // =========================================================
 
     private static class Worker implements Runnable {
 
@@ -353,46 +326,51 @@ public class MD5Search {
         }
     }
 
-
-
-    /*
-     * SUPPORTING CLASS: Search range assigned to each thread
-     */
+    // Supporting Class, search range assigned to each thread
     private static class SearchRange {
 
+        // starting index of the search range (included)
         private final long startInclusive;
+
+        // ending index of the search range (excluded)
         private final long endExclusive;
 
+        // initialize the starting and ending index of the range
         public SearchRange(long startInclusive, long endExclusive) {
             this.startInclusive = startInclusive;
             this.endExclusive = endExclusive;
         }
     }
 
-    /*
-     * SUPPORTING CLASS: Store the recovered password and thread ID
-     */
-
+    // Supporting Class, store the recovered password and the ID of the thread that found it
     private static class SearchResult {
 
+        // store the password that matches the target MD5 hash
         private final String password;
+
+        // store the ID of the thread that found the password
         private final long threadId;
 
+        // initialize the recovered password and thread ID
         public SearchResult(String password, long threadId) {
             this.password = password;
             this.threadId = threadId;
         }
     }
 
-    /*
-     * SUPPORTING CLASS: Store validated CLI inputs
-     */
+    // Supporting Class, store the validated command-line input values
     private static class Config {
 
+        // store the target MD5 hash entered by the user
         private final String targetHash;
+
+        // store the number of worker threads to be used
         private final int threadCount;
+
+        // store the length of the password to be searched
         private final int passwordLength;
 
+        // initialize the validated input values
         public Config(
                 String targetHash,
                 int threadCount,
