@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference; //Provides thread-safe acces
 public class MD5Search {
     // Declare Total possible ASCII characters: decimal 32 to 126
     private static final int CHAR_START = 32;
-    private static final int CHAR_END = 126;
+    // private static final int CHAR_END = 126;
     private static final int CHAR_COUNT = 95;
 
     public static void main(String[] args) throws InterruptedException {
@@ -234,46 +234,55 @@ public class MD5Search {
     // The ranges must cover every combination.
     // =========================================================
 
+    // divide the search space into non-overlapping ranges for each thread
+    // each range uses a start-inclusive and end-exclusive index
     private static List<SearchRange> partitionSearchSpace(
             long totalCombinations,
             int threadCount) {
 
+        // store the search range assigned to each thread
+        List<SearchRange> ranges = new ArrayList<>();
 
-        // 2ND PERSON Task: IMPLEMENT THIS PART
-        // Suggested partitioning formula:
-        //
-        // start = totalCombinations * threadIndex / threadCount;
-        //
-        // end = totalCombinations * (threadIndex + 1) / threadCount;
-        //
-        // Return a List<SearchRange> containing one range per thread.
+        for (int i = 0; i < threadCount; i++) {
 
-        throw new UnsupportedOperationException(
-            "Friend needs to implement partitionSearchSpace()."
-        );
+            // calculate the starting and ending index for each thread
+            long start = totalCombinations * i / threadCount;
+            long end = totalCombinations * (i + 1) / threadCount;
+
+             // add the calculated range to the list
+            ranges.add(new SearchRange(start, end));
+        }
+
+        return ranges;
     }
 
 
     // =========================================================
     // 2ND PERSON Task: IMPLEMENT THIS PART
-    // Convert a numeric index into an ASCII password candidate.
-    // Use characters from ASCII 32 to 126.
-    // Keep the candidate-generation order consistent.
     // =========================================================
 
+    // convert a numeric index into a password using base-95 conversion
     private static String passwordFromIndex(
             long index,
             int passwordLength) {
 
-        // 2ND PERSON Task: IMPLEMENT THIS PART
+        // create a character array to store the password
+        char[] password = new char[passwordLength];
 
-        // Convert the index into a password using base-95 conversion.
-        // ASCII 32 is the first character.
-        // ASCII 126 is the last character.
+        // generate characters from right to left
+        for (int i = passwordLength - 1; i >= 0; i--) {
 
-        throw new UnsupportedOperationException(
-            "Friend needs to implement passwordFromIndex()."
-        );
+            // get the remainder to determine the next character
+            int remainder = (int) (index % CHAR_COUNT);
+
+            // convert the remainder into its corresponding ASCII character
+            password[i] = (char) (CHAR_START + remainder);
+
+            // move to the next position in the base-95 conversion
+            index = index / CHAR_COUNT;
+        }
+
+        return new String(password);
     }
 
 
@@ -307,35 +316,40 @@ public class MD5Search {
         @Override
         public void run() {
 
-            // 2ND PERSON Task: IMPLEMENT THIS PART
+            for (long index = range.startInclusive;
+                index < range.endExclusive;
+                index++) {
 
-            // Suggested searching process:
-            //
-            // 1. Loop through this worker's assigned index range.
-            //
-            // 2. Before checking each candidate, check whether:
-            //    sharedResult.get() != null
-            //
-            //    If another thread has found the password, stop.
-            //
-            // 3. Convert the current index into a password:
-            //    String candidate =
-            //        passwordFromIndex(index, passwordLength);
-            //
-            // 4. Generate the candidate's MD5 hash:
-            //    String candidateHash = getMd5(candidate);
-            //
-            // 5. Compare candidateHash with targetHash.
-            //
-            // 6. If they match, create a SearchResult containing:
-            //    - The recovered password
-            //    - Thread.currentThread().getId()
-            //
-            // 7. Publish the result using:
-            //    sharedResult.compareAndSet(null, foundResult);
-            //
-            // 8. Stop this worker after finding the password.
+                // check whether another thread has found the password
+                if (sharedResult.get() != null) {
+                    return;
+                }
 
+                // generate a password candidate
+                String candidate = passwordFromIndex(
+                index,
+                passwordLength
+                );
+
+                // generate MD5 hash of the candidate
+                String candidateHash = getMd5(candidate);
+
+                // compare with the target MD5 hash
+                if (candidateHash.equals(targetHash)) {
+
+                    // store the recovered password and thread ID
+                    SearchResult foundResult = new SearchResult(
+                        candidate,
+                        Thread.currentThread().threadId()
+                    );
+
+                    // publish the result to other threads
+                    sharedResult.compareAndSet(null, foundResult);
+
+                    // stop this worker
+                    return;
+                }
+            }
         }
     }
 
