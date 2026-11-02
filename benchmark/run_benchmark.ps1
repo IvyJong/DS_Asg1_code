@@ -168,6 +168,25 @@ foreach ($test in $tests) {
                 throw "Recovered password length does not match the expected length."
             }
 
+            # Verify that the recovered password matches the target MD5 hash.
+            $md5 = [System.Security.Cryptography.MD5]::Create()
+            try {
+                $passwordBytes = [System.Text.Encoding]::UTF8.GetBytes(
+                    $recoveredPassword
+                )
+                $actualHash = [BitConverter]::ToString(
+                    $md5.ComputeHash($passwordBytes)
+                ).Replace('-', '').ToLowerInvariant()
+            }
+            finally {
+                $md5.Dispose()
+            }
+
+            if ($actualHash -ne $targetHash.ToLowerInvariant()) {
+                Write-Host $javaOutput
+                throw "Recovered password does not match the target MD5 hash. Run was not recorded."
+            }
+
             # Extract the thread ID that found the password.
             $threadMatch = [regex]::Match(
                 $javaOutput,
