@@ -33,10 +33,12 @@ public class MD5Search {
         );
 
         //print output for hash information
+        System.out.println();
         System.out.println("Target MD5: " + config.targetHash);
         System.out.println("Number of threads: " + config.threadCount);
         System.out.println("Password length: " + config.passwordLength);
         System.out.println("Total combinations: " + totalCombinations);
+        System.out.println();
 
         // Shared result used by all worker threads.
         // null means the password has not been found yet.
@@ -292,6 +294,11 @@ public class MD5Search {
                 throw new RuntimeException("MD5 algorithm not available.", e);
             }
 
+            // Display when this worker starts searching.
+            System.out.println(
+                Thread.currentThread().getName() + " started searching."
+            );
+
             // Search through the worker's assigned range.
             for (long index = range.startInclusive;
                 index < range.endExclusive;
@@ -299,6 +306,10 @@ public class MD5Search {
 
                 // Check whether another worker has found the password.
                 if (sharedResult.get() != null) {
+                    System.out.println(
+                        Thread.currentThread().getName()
+                        + " detected that the password was found. Stopping search."
+                    );
                     return;
                 }
 
@@ -321,7 +332,12 @@ public class MD5Search {
                     );
 
                     // Publish the result to other workers.
-                    sharedResult.compareAndSet(null, foundResult);
+                    if (sharedResult.compareAndSet(null, foundResult)) {
+                        System.out.println(
+                            Thread.currentThread().getName()
+                        + " found the password: " + candidate
+                        );
+                    }   
 
                     // Stop this worker.
                     return;
