@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicReference; //Provides thread-safe acces
 public class MD5Search {
     // Declare Total possible ASCII characters: decimal 32 to 126
     private static final int CHAR_START = 32;
-    // private static final int CHAR_END = 126;
     private static final int CHAR_COUNT = 95;
 
     public static void main(String[] args) throws InterruptedException {
