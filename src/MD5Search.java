@@ -189,7 +189,7 @@ public class MD5Search {
 
         List<Thread> workers = new ArrayList<>();
 
-        // FRIEND: partitionSearchSpace() must return one range per thread.
+        //  partitionSearchSpace() must return one range per thread.
         List<SearchRange> ranges = partitionSearchSpace(
             totalCombinations,
             config.threadCount
