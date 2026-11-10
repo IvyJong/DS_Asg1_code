@@ -199,6 +199,19 @@ public class MD5Search {
         for (int i = 0; i < config.threadCount; i++) {
 
             SearchRange range = ranges.get(i);
+            
+             // Display the search range assigned to each worker
+            System.out.printf(
+                "Worker-%d assigned indexes [%d, %d)%n",
+                i + 1,
+                range.startInclusive,
+                range.endExclusive
+            );
+            
+            // Add a blank line after the last worker's range
+            if (i == config.threadCount - 1) {
+                System.out.println();
+            }
 
             Worker task = new Worker(
                 range,
